@@ -1,6 +1,6 @@
 FROM ubuntu:14.04
 
-MAINTAINER takuya.wakisaka@moldweorp.com
+MAINTAINER xiang.sean.ma@gmail.com
 
 ENV PYTHONPATH /opt/caffe-segnet/python
 ENV PATH $PATH:/opt/caffe-segnet/.build_release/tools
@@ -58,6 +58,7 @@ RUN pip install --upgrade pip && \
     # fix: InsecurePlatformWarning: A true SSLContext object is not available.
     pip install pyopenssl ndg-httpsclient pyasn1 && \
     for req in $(cat python/requirements.txt); do pip install $req; done
+RUN easy_install -U scikit-image
 
 # Build Caffe python
 RUN make -j"$(nproc)" pycaffe
@@ -65,3 +66,7 @@ RUN make -j"$(nproc)" pycaffe
 # test + run tests
 RUN make -j"$(nproc)" test
 # RUN cd /opt/caffe && make runtest
+
+# remove warning for 1394 (maybe related to opencv)
+# http://stackoverflow.com/questions/12689304/ctypes-error-libdc1394-error-failed-to-initialize-libdc1394
+sudo ln /dev/null /dev/raw1394
